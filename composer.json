@@ -1,0 +1,23 @@
+{
+    "name": "wukong/curl",
+    "description": "the curl library.",
+    "type": "tool",
+    "keywords": ["curl"],
+    "homepage": "http://www.wkidt.com/",
+    "license": "Apache2",
+    "authors": [
+        {
+            "name": "LSQ",
+            "email": "735041553@qq.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-0": {
+            "Curl\\": ""
+        }
+    }
+}
