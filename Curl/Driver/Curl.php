@@ -5,20 +5,25 @@
  * Some rights reserved：abc3210.com
  * Contact email:admin@abc3210.com
  */
-class Curl {
+
+namespace Curl\Driver;
+
+class Curl extends \Curl\Curl
+{
 
     /**
-     * 
-     * @param type $method 请求方式
-     * @param type $url 地址
-     * @param type $fields 附带参数，可以是数组，也可以是字符串
-     * @param type $userAgent 浏览器UA
-     * @param type $httpHeaders header头部，数组形式
-     * @param type $username 用户名
-     * @param type $password 密码
+     * 执行请求
+     * @param string $method 请求方式
+     * @param string $url 地址
+     * @param string|array $fields 附带参数，可以是数组，也可以是字符串
+     * @param string $userAgent 浏览器UA
+     * @param string $httpHeaders header头部，数组形式
+     * @param string $username 用户名
+     * @param string $password 密码
      * @return boolean
      */
-    public  function execute($method, $url, $fields = '', $userAgent = '', $httpHeaders = '', $username = '', $password = '') {
+    protected function execute($method, $url, $fields = '', $userAgent = '', $httpHeaders = '', $username = '', $password = '')
+    {
         $ch = $this->create(); //得到一个curl句柄
         if (false === $ch) {
             return false;
@@ -35,12 +40,12 @@ class Curl {
         if ($username != '') {
             curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password); //传递一个连接中需要的用户名和密码，格式为
         }
-        
+
         if (stripos($url, "https://") !== FALSE) {
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);  //检查服务器SSL证书中是否存在一个公用名(common name)。
         }
-        
+
         $method = strtolower($method);
         if ('post' == $method) {
             curl_setopt($ch, CURLOPT_POST, true); //启用时会发送一个常规的POST请求，类型为：application/x-www-form-urlencoded，就像表单提交的一样。
@@ -55,9 +60,7 @@ class Curl {
         } else if ('put' == $method) {
             curl_setopt($ch, CURLOPT_PUT, true);
         }
-        //curl_setopt($ch, CURLOPT_PROGRESS, true);
-        //curl_setopt($ch, CURLOPT_VERBOSE, true);
-        //curl_setopt($ch, CURLOPT_MUTE, false);
+
         curl_setopt($ch, CURLOPT_TIMEOUT, 10); //设置curl超时秒数
         if (strlen($userAgent)) {
             curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
@@ -80,16 +83,13 @@ class Curl {
 
     /**
      * 发送POST请求
-     * @param type $url 地址
-     * @param type $fields 附带参数，可以是数组，也可以是字符串
-     * @param type $userAgent 浏览器UA
-     * @param type $httpHeaders header头部，数组形式
-     * @param type $username 用户名
-     * @param type $password 密码
+     * @param string $url 地址
+     * @param string|array $params 附带参数，可以是数组，也可以是字符串
      * @return boolean
      */
-    public function post($url, $fields, $userAgent = '', $httpHeaders = '', $username = '', $password = '') {
-        $ret = $this->execute('POST', $url, $fields, $userAgent, $httpHeaders, $username, $password);
+    public function post($url, $params)
+    {
+        $ret = $this->execute('POST', $url, $params);
         if (false === $ret) {
             return false;
         }
@@ -101,15 +101,13 @@ class Curl {
 
     /**
      * GET
-     * @param type $url 地址
-     * @param type $userAgent 浏览器UA
-     * @param type $httpHeaders header头部，数组形式
-     * @param type $username 用户名
-     * @param type $password 密码
+     * @param string $url 地址
+     * @param string $params 浏览器UA
      * @return boolean
      */
-    public function get($url, $userAgent = '', $httpHeaders = '', $username = '', $password = '') {
-        $ret = $this->execute('GET', $url, "", $userAgent, $httpHeaders, $username, $password);
+    public function get($url, $params = '')
+    {
+        $ret = $this->execute('GET', $this->_parseUrl($url, $params));
         if (false === $ret) {
             return false;
         }
@@ -120,10 +118,31 @@ class Curl {
     }
 
     /**
+     * 设置ua
+     * @param $ua
+     * @return bool
+     */
+    public function setUserAgent($ua)
+    {
+        return false;
+    }
+
+    /**
+     * 设置头信息
+     * @param $header
+     * @return bool
+     */
+    public function setHeader($header)
+    {
+        return false;
+    }
+
+    /**
      * curl支持 检测
      * @return boolean
      */
-    public function create() {
+    public function create()
+    {
         $ch = null;
         if (!function_exists('curl_init')) {
             return false;
@@ -134,5 +153,4 @@ class Curl {
         }
         return $ch;
     }
-
 }
